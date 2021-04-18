@@ -47,6 +47,19 @@ class vec3 {
   z() {
     return this.e[2];
   }
+  near_zero() {
+    var s = 1e-8;
+    return (
+      Math.abs(this.e[0]) < s &&
+      Math.abs(this.e[1]) < s &&
+      Math.abs(this.e[2]) < s
+    );
+  }
+  copy(vec) {
+    this.e[0] = vec.x();
+    this.e[1] = vec.y();
+    this.e[2] = vec.z();
+  }
 }
 
 // aliasing for code readability later on
@@ -89,6 +102,10 @@ function cross(u, v) {
 
 function unit_vector(v) {
   return divide(v, v.length());
+}
+
+function reflect(v, n) {
+  return subtract(v, multiplyConst(n, 2 * dot(v, n)));
 }
 
 function random_vector() {

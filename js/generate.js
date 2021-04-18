@@ -23,11 +23,11 @@ function sky_gradient(r) {
   return lerp(start, end, t);
 }
 
-function random_unit_vec_in_unit_sphere() {
+function random_unit_vec() {
   while (true) {
     var p = random_vector(-1, 1);
     if (p.length_squared() >= 1) continue;
-    return unit_vector(p);
+    return p;
   }
 }
 
@@ -37,15 +37,12 @@ function ray_color(r, world, depth) {
   var rec = new hit_record();
   if (depth <= 0) return new color(0, 0, 0); //stack safety lol
   if (world.hit(r, 0.001, Number.MAX_SAFE_INTEGER, rec)) {
-    //for each intersection, we 'bounce' the ray in a random point in unit sphere normal to the current point
-    var target = add(rec.p, rec.normal);
-    target = add(target, random_unit_vec_in_unit_sphere());
+    var scattered = new ray();
+    var attenuation = new color(0, 0, 0);
+    if (rec.mat_ptr.scatter(r, rec, attenuation, scattered))
+      return multiplyVec(attenuation, ray_color(scattered, world, depth - 1));
 
-    var newRay = new ray(rec.p, subtract(target, rec.p));
-
-    var col = ray_color(newRay, world, depth - 1);
-    col = multiplyConst(col, 0.5);
-    return col;
+    return new color(0, 0, 0);
   }
   //if nothing hit
   return sky_gradient(r);
@@ -66,11 +63,18 @@ function write_color(col, samples_per_pixel) {
 function generate() {
   //world(scene)
   var world = new hittable_list();
-  world.add(new sphere(new point3(0, 0, -1), 0.5));
-  world.add(new sphere(new point3(0, -100.5, -1), 100));
+  var material_ground = new lambertian(new color(0.8, 0.8, 0.0));
+  var material_center = new lambertian(new color(0.7, 0.3, 0.3));
+  var material_left = new metal(new color(0.8, 0.8, 0.8), 0.3);
+  var material_right = new metal(new color(0.8, 0.6, 0.2), 0.1);
+
+  world.add(new sphere(new point3(0.0, -100.5, -1.0), 100.0, material_ground));
+  world.add(new sphere(new point3(0.0, 0.0, -1.0), 0.5, material_center));
+  world.add(new sphere(new point3(-1.0, 0.0, -1.0), 0.5, material_left));
+  world.add(new sphere(new point3(1.0, 0.0, -1.0), 0.5, material_right));
   //camera settings
-  var samples_per_pixel = 20; //More makes image better but generation is much slower
-  var max_depth = 20; //recursion depth for ray bouncing
+  var samples_per_pixel = 10; //More makes image better but generation is much slower
+  var max_depth = 100; //recursion depth for ray bouncing, more means less black spots
   var cam = new camera();
 
   for (var j = canvasHeight - 1; j >= 0; --j) {

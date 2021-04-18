@@ -9,4 +9,8 @@ class ray {
     const offset = multiplyConst(this.direction, t);
     return add(this.origin, offset);
   }
+  copy(r) {
+    this.origin = r.origin;
+    this.direction = r.direction;
+  }
 }
