@@ -23,11 +23,11 @@ function sky_gradient(r) {
   return lerp(start, end, t);
 }
 
-function random_vec_in_unit_sphere() {
+function random_unit_vec_in_unit_sphere() {
   while (true) {
     var p = random_vector(-1, 1);
     if (p.length_squared() >= 1) continue;
-    return p;
+    return unit_vector(p);
   }
 }
 
@@ -39,7 +39,7 @@ function ray_color(r, world, depth) {
   if (world.hit(r, 0.001, Number.MAX_SAFE_INTEGER, rec)) {
     //for each intersection, we 'bounce' the ray in a random point in unit sphere normal to the current point
     var target = add(rec.p, rec.normal);
-    target = add(target, random_vec_in_unit_sphere());
+    target = add(target, random_unit_vec_in_unit_sphere());
 
     var newRay = new ray(rec.p, subtract(target, rec.p));
 
@@ -69,8 +69,8 @@ function generate() {
   world.add(new sphere(new point3(0, 0, -1), 0.5));
   world.add(new sphere(new point3(0, -100.5, -1), 100));
   //camera settings
-  var samples_per_pixel = 10; //anti-aliasing parameter. More is smoother but much slower
-  var max_depth = 5;
+  var samples_per_pixel = 20; //More makes image better but generation is much slower
+  var max_depth = 20; //recursion depth for ray bouncing
   var cam = new camera();
 
   for (var j = canvasHeight - 1; j >= 0; --j) {
