@@ -36,7 +36,7 @@ function random_vec_in_unit_sphere() {
 function ray_color(r, world, depth) {
   var rec = new hit_record();
   if (depth <= 0) return new color(0, 0, 0); //stack safety lol
-  if (world.hit(r, 0, Number.MAX_SAFE_INTEGER, rec)) {
+  if (world.hit(r, 0.001, Number.MAX_SAFE_INTEGER, rec)) {
     //for each intersection, we 'bounce' the ray in a random point in unit sphere normal to the current point
     var target = add(rec.p, rec.normal);
     target = add(target, random_vec_in_unit_sphere());
@@ -53,7 +53,13 @@ function ray_color(r, world, depth) {
 
 function write_color(col, samples_per_pixel) {
   var scale = 1.0 / samples_per_pixel;
-  return toneMap(multiplyConst(col, scale));
+  //gamma correction
+  var newCol = new color(
+    Math.sqrt(col.x() * scale),
+    Math.sqrt(col.y() * scale),
+    Math.sqrt(col.z() * scale)
+  );
+  return toneMap(newCol);
 }
 //Generate the image
 //generates a smooth gradient for now
