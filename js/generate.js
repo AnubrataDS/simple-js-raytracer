@@ -31,15 +31,28 @@ function generate() {
   var horizontal = new vec3(viewport_width, 0, 0);
   var vertical = new vec3(0, viewport_height, 0);
 
+  //lower_left_corner = origin - horizontal/2 - vertical/2 - vec3(0, 0, focal_length);
+  //into the screen is -ve z
+  //camera(eye) is at (0,0,0)
+  //"virtual viewport" is a rectangular planar segment , normal to z-axis
+  //with dimensions (viewport_width,viewport_height,0)
+  //and is centered at (0,0,focal_length)
+  //we find the lower left corner of this rectangle
+
   var lower_left_corner = subtract(origin, divide(horizontal, 2.0));
   lower_left_corner = subtract(lower_left_corner, divide(vertical, 2.0));
   lower_left_corner = subtract(lower_left_corner, new vec3(0, 0, focal_length));
 
-  console.log(lower_left_corner);
   for (var j = canvasHeight - 1; j >= 0; --j) {
     for (var i = 0; i < canvasWidth; ++i) {
       var u = (i * 1.0) / (canvasWidth - 1);
       var v = (j * 1.0) / (canvasHeight - 1);
+
+      //direction = lower_left_corner + u*horizontal + v*vertical - origin
+      //current point is at (lower_left_corner + u*horizontal + v*vertical)
+      //we subtract origin to find the direction vector from origin to current point
+      //making it unit length is not necessary
+
       var direction = lower_left_corner;
       direction = add(direction, multiplyConst(horizontal, u));
       direction = add(direction, multiplyConst(vertical, v));
