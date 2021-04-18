@@ -2,6 +2,7 @@ class hit_record {
   constructor() {
     this.p = new point3();
     this.normal = new vec3();
+    this.mat_ptr = new material();
     this.t = 0.0;
     this.front_face = false;
   }
@@ -10,6 +11,7 @@ class hit_record {
     this.p = rec.p;
     this.normal = rec.normal;
     this.t = rec.t;
+    this.mat_ptr = rec.mat_ptr;
     this.front_face = rec.front_face;
   }
 
@@ -31,10 +33,11 @@ class hittable {
 }
 
 class sphere extends hittable {
-  constructor(cen, r) {
+  constructor(cen, r, mat_ptr) {
     super();
     this.center = cen;
     this.radius = r;
+    this.mat_ptr = mat_ptr;
   }
   hit(r, tmin, tmax, rec) {
     //ray-sphere intersection
@@ -76,6 +79,7 @@ class sphere extends hittable {
     //unit vector for surface normal = (point - center) / radius;
     var outward_normal = divide(subtract(rec.p, this.center), this.radius);
     rec.set_face_normal(r, outward_normal);
+    rec.mat_ptr = this.mat_ptr;
     return true;
   }
 }
