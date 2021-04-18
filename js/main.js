@@ -1,6 +1,7 @@
 //entry point
 
 function main() {
+  initialize();
   var t0 = performance.now();
   generate();
   var t1 = performance.now();

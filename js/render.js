@@ -7,10 +7,10 @@ function render() {
   for (var x = 0; x < canvasWidth; x++) {
     for (var y = 0; y < canvasHeight; y++) {
       var index = (x + y * canvasWidth) * 4;
-      canvasData.data[index + 0] = r[x][y];
-      canvasData.data[index + 1] = g[x][y];
-      canvasData.data[index + 2] = b[x][y];
-      canvasData.data[index + 3] = a[x][y];
+      canvasData.data[index + 0] = pixel[x][y].e[0];
+      canvasData.data[index + 1] = pixel[x][y].e[1];
+      canvasData.data[index + 2] = pixel[x][y].e[2];
+      canvasData.data[index + 3] = 255;
     }
   }
   ctx.putImageData(canvasData, 0, 0);
