@@ -9,6 +9,16 @@ function toneMap(col) {
 
 //calculate ray-sphere intersection
 function hit_sphere(center, radius, r) {
+  //let r = A + tb
+  //sphere : (P-C).(P-c) = radius^2
+  //ray : A + tb
+  //substituting, simplifying, we get :
+  //t^2b.b + 2tb.(A-C) + (A-c).(A-C) -radius^2 = 0
+
+  //considering this as a quadratic equation on t
+  //we get 2 real solutions only if discriminant > 0
+  //(we do not consider the case where ray is tangent to sphere as an intersection, i.e discriminant = 0 case)
+
   var oc = subtract(r.origin, center);
   var a = dot(r.direction, r.direction);
   var b = 2.0 * dot(oc, r.direction);
