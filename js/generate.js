@@ -22,13 +22,28 @@ function sky_gradient(r) {
   var end = new color(0.5, 0.7, 1.0); //sky blue
   return lerp(start, end, t);
 }
+
+function random_vec_in_unit_sphere() {
+  while (true) {
+    var p = random_vector(-1, 1);
+    if (p.length_squared() >= 1) continue;
+    return p;
+  }
+}
+
 //get color of ray at r
 //returns in range 0 to 1
-function ray_color(r, world) {
+function ray_color(r, world, depth) {
   var rec = new hit_record();
+  if (depth <= 0) return new color(0, 0, 0); //stack safety lol
   if (world.hit(r, 0, Number.MAX_SAFE_INTEGER, rec)) {
-    //map from range -1 to 1 to range 0 to 1
-    var col = add(rec.normal, new color(1, 1, 1));
+    //for each intersection, we 'bounce' the ray in a random point in unit sphere normal to the current point
+    var target = add(rec.p, rec.normal);
+    target = add(target, random_vec_in_unit_sphere());
+
+    var newRay = new ray(rec.p, subtract(target, rec.p));
+
+    var col = ray_color(newRay, world, depth - 1);
     col = multiplyConst(col, 0.5);
     return col;
   }
@@ -49,6 +64,7 @@ function generate() {
   world.add(new sphere(new point3(0, -100.5, -1), 100));
   //camera settings
   var samples_per_pixel = 10; //anti-aliasing parameter. More is smoother but much slower
+  var max_depth = 5;
   var cam = new camera();
 
   for (var j = canvasHeight - 1; j >= 0; --j) {
@@ -58,7 +74,7 @@ function generate() {
         var u = (i + Math.random()) / (canvasWidth - 1);
         var v = (j + Math.random()) / (canvasHeight - 1);
         var r = cam.getRay(u, v);
-        pixel_color.add(ray_color(r, world));
+        pixel_color.add(ray_color(r, world, max_depth));
       }
 
       pixel[i][j] = write_color(pixel_color, samples_per_pixel);

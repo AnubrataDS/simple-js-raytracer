@@ -91,6 +91,20 @@ function unit_vector(v) {
   return divide(v, v.length());
 }
 
+function random_vector() {
+  return new vec3(Math.random(), Math.random(), Math.random());
+}
+
+function random_vector(min, max) {
+  return new vec3(
+    random_ranged(min, max),
+    random_ranged(min, max),
+    random_ranged(min, max)
+  );
+}
+function random_ranged(min, max) {
+  return min + (max - min) * Math.random();
+}
 //lerp : linear interpolation/linear blend
 // valueAtT = (1-t).startValue + t.endValue
 function lerp(start, end, t) {
