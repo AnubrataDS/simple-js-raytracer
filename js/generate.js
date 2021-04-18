@@ -7,14 +7,25 @@ function toneMap(col) {
   );
 }
 
-//get background color
-//generates a linear gradient along y-axis
+//calculate ray-sphere intersection
+function hit_sphere(center, radius, r) {
+  var oc = subtract(r.origin, center);
+  var a = dot(r.direction, r.direction);
+  var b = 2.0 * dot(oc, r.direction);
+  var c = dot(oc, oc) - radius * radius;
+  var discriminant = b * b - 4 * a * c;
+  return discriminant > 0;
+}
+//get color of ray at r
 function ray_color(r) {
+  if (hit_sphere(new point3(0, 0, -1), 0.5, r)) return new color(1, 0, 0);
+  //generates a linear gradient along y-axis if nothing hit
   var unit_direction = unit_vector(r.direction);
-  var t = (unit_direction.y() + 1.0) * 0.5; //
+  //skew the gradient a bit for more blue area on top
+  var t = (unit_direction.y() + 1.0) * 0.5;
   var start = new color(1.0, 1.0, 1.0); //white
   var end = new color(0.5, 0.7, 1.0); //sky blue
-  return toneMap(lerp(start, end, t));
+  return lerp(start, end, t);
 }
 
 //Generate the image
@@ -58,7 +69,7 @@ function generate() {
       direction = add(direction, multiplyConst(vertical, v));
       direction = subtract(direction, origin);
       var r = new ray(origin, direction);
-      pixel[i][j] = ray_color(r);
+      pixel[i][j] = toneMap(ray_color(r));
     }
   }
 }
