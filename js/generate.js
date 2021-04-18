@@ -1,10 +1,16 @@
 //utility to map values from range 0-1 to range 0-255
 function toneMap(col) {
   return new color(
-    Math.floor(255.999 * col.x()),
-    Math.floor(255.999 * col.y()),
-    Math.floor(255.999 * col.z())
+    Math.floor(256 * clamp(col.x(), 0, 0.999)),
+    Math.floor(256 * clamp(col.y(), 0, 0.999)),
+    Math.floor(256 * clamp(col.z(), 0, 0.999))
   );
+}
+
+function clamp(x, min, max) {
+  if (x < min) return min;
+  if (x > max) return max;
+  return x;
 }
 
 function sky_gradient(r) {
@@ -30,6 +36,10 @@ function ray_color(r, world) {
   return sky_gradient(r);
 }
 
+function write_color(col, samples_per_pixel) {
+  var scale = 1.0 / samples_per_pixel;
+  return toneMap(multiplyConst(col, scale));
+}
 //Generate the image
 //generates a smooth gradient for now
 function generate() {
@@ -38,44 +48,20 @@ function generate() {
   world.add(new sphere(new point3(0, 0, -1), 0.5));
   world.add(new sphere(new point3(0, -100.5, -1), 100));
   //camera settings
-  var aspect_ratio = canvasWidth / canvasHeight;
-
-  var viewport_height = 2.0;
-  var viewport_width = aspect_ratio * viewport_height;
-  var focal_length = 1.0;
-
-  var origin = new point3(0, 0, 0);
-  var horizontal = new vec3(viewport_width, 0, 0);
-  var vertical = new vec3(0, viewport_height, 0);
-
-  //lower_left_corner = origin - horizontal/2 - vertical/2 - vec3(0, 0, focal_length);
-  //into the screen is -ve z
-  //camera(eye) is at (0,0,0)
-  //"virtual viewport" is a rectangular planar segment , normal to z-axis
-  //with dimensions (viewport_width,viewport_height,0)
-  //and is centered at (0,0,focal_length)
-  //we find the lower left corner of this rectangle
-
-  var lower_left_corner = subtract(origin, divide(horizontal, 2.0));
-  lower_left_corner = subtract(lower_left_corner, divide(vertical, 2.0));
-  lower_left_corner = subtract(lower_left_corner, new vec3(0, 0, focal_length));
+  var samples_per_pixel = 10; //anti-aliasing parameter. More is smoother but much slower
+  var cam = new camera();
 
   for (var j = canvasHeight - 1; j >= 0; --j) {
     for (var i = 0; i < canvasWidth; ++i) {
-      var u = (i * 1.0) / (canvasWidth - 1);
-      var v = (j * 1.0) / (canvasHeight - 1);
+      var pixel_color = new color(0, 0, 0);
+      for (var s = 0; s < samples_per_pixel; ++s) {
+        var u = (i + Math.random()) / (canvasWidth - 1);
+        var v = (j + Math.random()) / (canvasHeight - 1);
+        var r = cam.getRay(u, v);
+        pixel_color.add(ray_color(r, world));
+      }
 
-      //direction = lower_left_corner + u*horizontal + v*vertical - origin
-      //current point is at (lower_left_corner + u*horizontal + v*vertical)
-      //we subtract origin to find the direction vector from origin to current point
-      //making it unit length is not necessary
-
-      var direction = lower_left_corner;
-      direction = add(direction, multiplyConst(horizontal, u));
-      direction = add(direction, multiplyConst(vertical, v));
-      direction = subtract(direction, origin);
-      var r = new ray(origin, direction);
-      pixel[i][j] = toneMap(ray_color(r, world));
+      pixel[i][j] = write_color(pixel_color, samples_per_pixel);
     }
   }
 }
