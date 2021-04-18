@@ -17,5 +17,4 @@ function render() {
   }
 
   ctx.putImageData(canvasData, 0, 0);
-  console.log(pixel);
 }

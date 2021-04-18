@@ -7,28 +7,6 @@ function toneMap(col) {
   );
 }
 
-//calculate ray-sphere intersection
-function hit_sphere(center, radius, r) {
-  //let r = A + tb
-  //sphere : (P-C).(P-c) = radius^2
-  //ray : A + tb
-  //substituting, simplifying, we get :
-  //t^2b.b + 2tb.(A-C) + (A-c).(A-C) -radius^2 = 0
-
-  //considering this as a quadratic equation on t
-  //we can't get real solutions if discriminant < 0
-
-  var oc = subtract(r.origin, center);
-  var a = dot(r.direction, r.direction);
-  var b = 2.0 * dot(oc, r.direction);
-  var c = dot(oc, oc) - radius * radius;
-  var discriminant = b * b - 4 * a * c;
-  if (discriminant < 0) return -1;
-  else {
-    //we are only interested in smallest solution as it is the front face
-    return (-b - Math.sqrt(discriminant)) / (2.0 * a);
-  }
-}
 function sky_gradient(r) {
   //generates a linear gradient along y-axis
   var unit_direction = unit_vector(r.direction);
@@ -40,15 +18,11 @@ function sky_gradient(r) {
 }
 //get color of ray at r
 //returns in range 0 to 1
-function ray_color(r) {
-  var C = new point3(0, 0, -1);
-  var t = hit_sphere(C, 0.5, r);
-  if (t > 0) {
-    //Surface normal at a point for sphere = point - center
-    //we put solved value of t in ray equation to get point on surface where ray meets sphere
-    var N = unit_vector(subtract(r.at(t), C));
-    //surface normals are in range -1 to 1, map then from 0 to 1
-    var col = new color(N.x() + 1, N.y() + 1, N.z() + 1);
+function ray_color(r, world) {
+  var rec = new hit_record();
+  if (world.hit(r, 0, Number.MAX_SAFE_INTEGER, rec)) {
+    //map from range -1 to 1 to range 0 to 1
+    var col = add(rec.normal, new color(1, 1, 1));
     col = multiplyConst(col, 0.5);
     return col;
   }
@@ -59,6 +33,10 @@ function ray_color(r) {
 //Generate the image
 //generates a smooth gradient for now
 function generate() {
+  //world(scene)
+  var world = new hittable_list();
+  world.add(new sphere(new point3(0, 0, -1), 0.5));
+  world.add(new sphere(new point3(0, -100.5, -1), 100));
   //camera settings
   var aspect_ratio = canvasWidth / canvasHeight;
 
@@ -97,7 +75,7 @@ function generate() {
       direction = add(direction, multiplyConst(vertical, v));
       direction = subtract(direction, origin);
       var r = new ray(origin, direction);
-      pixel[i][j] = toneMap(ray_color(r));
+      pixel[i][j] = toneMap(ray_color(r, world));
     }
   }
 }

@@ -72,7 +72,9 @@ function multiplyVec(u, v) {
 function divide(u, t) {
   return multiplyConst(u, 1.0 / t);
 }
-
+function negative(u) {
+  return new vec3(-u.x(), -u.y(), -u.z());
+}
 function dot(u, v) {
   return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2];
 }
