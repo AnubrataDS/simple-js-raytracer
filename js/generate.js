@@ -16,26 +16,44 @@ function hit_sphere(center, radius, r) {
   //t^2b.b + 2tb.(A-C) + (A-c).(A-C) -radius^2 = 0
 
   //considering this as a quadratic equation on t
-  //we get 2 real solutions only if discriminant > 0
-  //(we do not consider the case where ray is tangent to sphere as an intersection, i.e discriminant = 0 case)
+  //we can't get real solutions if discriminant < 0
 
   var oc = subtract(r.origin, center);
   var a = dot(r.direction, r.direction);
   var b = 2.0 * dot(oc, r.direction);
   var c = dot(oc, oc) - radius * radius;
   var discriminant = b * b - 4 * a * c;
-  return discriminant > 0;
+  if (discriminant < 0) return -1;
+  else {
+    //we are only interested in smallest solution as it is the front face
+    return (-b - Math.sqrt(discriminant)) / (2.0 * a);
+  }
 }
-//get color of ray at r
-function ray_color(r) {
-  if (hit_sphere(new point3(0, 0, -1), 0.5, r)) return new color(1, 0, 0);
-  //generates a linear gradient along y-axis if nothing hit
+function sky_gradient(r) {
+  //generates a linear gradient along y-axis
   var unit_direction = unit_vector(r.direction);
-  //skew the gradient a bit for more blue area on top
+  //unit_direction is in range -1 to 1, map it to range 0 to 1
   var t = (unit_direction.y() + 1.0) * 0.5;
   var start = new color(1.0, 1.0, 1.0); //white
   var end = new color(0.5, 0.7, 1.0); //sky blue
   return lerp(start, end, t);
+}
+//get color of ray at r
+//returns in range 0 to 1
+function ray_color(r) {
+  var C = new point3(0, 0, -1);
+  var t = hit_sphere(C, 0.5, r);
+  if (t > 0) {
+    //Surface normal at a point for sphere = point - center
+    //we put solved value of t in ray equation to get point on surface where ray meets sphere
+    var N = unit_vector(subtract(r.at(t), C));
+    //surface normals are in range -1 to 1, map then from 0 to 1
+    var col = new color(N.x() + 1, N.y() + 1, N.z() + 1);
+    col = multiplyConst(col, 0.5);
+    return col;
+  }
+  //if nothing hit
+  return sky_gradient(r);
 }
 
 //Generate the image

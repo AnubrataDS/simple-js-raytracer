@@ -6,6 +6,7 @@ class ray {
   }
   //return a point on the ray at given distance from origin
   at(t) {
-    return origin.add(this.direction.multiply(t));
+    const offset = multiplyConst(this.direction, t);
+    return add(this.origin, offset);
   }
 }
