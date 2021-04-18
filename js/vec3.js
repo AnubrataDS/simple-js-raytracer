@@ -30,8 +30,31 @@ class vec3 {
   length() {
     return Math.sqrt(this.length_squared());
   }
+  toString() {
+    return e[0] + " " + e[1] + " " + e[2];
+  }
 }
 
 // aliasing for code readability later on
 var point3 = vec3;
 var color = vec3;
+
+//utility functions for vectors
+//again, global scoping is bad but I'm trying to follow along for now
+//TODO : Remove global scoped material
+
+function dot_product(u, v) {
+  return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2];
+}
+
+function cross_product(u, v) {
+  return new vec3(
+    u.e[1] * v.e[2] - u.e[2] * v.e[1],
+    u.e[2] * v.e[0] - u.e[0] * v.e[2],
+    u.e[0] * v.e[1] - u.e[1] * v.e[0]
+  );
+}
+
+function unit_vector(v) {
+  return v / v.length();
+}
