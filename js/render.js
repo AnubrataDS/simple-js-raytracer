@@ -1,4 +1,6 @@
+//Draw image to the canvas
 //TODO : Profile this to see if imagedata is actually faster than drawing unit width rectangles at each point
+
 function render() {
   var ctx = canvas.getContext("2d");
   var canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);

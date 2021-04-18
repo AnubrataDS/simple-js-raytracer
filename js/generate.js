@@ -1,3 +1,6 @@
+//Generate the image
+//generates a smooth gradient for now
+
 function toneMap(val) {
   return Math.floor(255.999 * val);
 }

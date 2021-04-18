@@ -1,3 +1,5 @@
+//entry point
+
 function main() {
   var t0 = performance.now();
   generate();
