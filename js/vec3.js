@@ -108,6 +108,19 @@ function reflect(v, n) {
   return subtract(v, multiplyConst(n, 2 * dot(v, n)));
 }
 
+function refract(uv, n, etai_over_etat) {
+  var cos_theta = Math.min(1.0, dot(negative(uv), n));
+  var r_out_perp = multiplyConst(
+    add(uv, multiplyConst(n, cos_theta)),
+    etai_over_etat
+  );
+  var r_out_parallel_constant_term = -Math.sqrt(
+    Math.abs(1.0 - r_out_perp.length_squared())
+  );
+  var r_out_parallel = multiplyConst(n, r_out_parallel_constant_term);
+  return add(r_out_perp, r_out_parallel);
+}
+
 function random_vector() {
   return new vec3(Math.random(), Math.random(), Math.random());
 }
