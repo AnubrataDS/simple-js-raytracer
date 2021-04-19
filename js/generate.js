@@ -76,7 +76,7 @@ function generate() {
   //camera settings
   var samples_per_pixel = 10; //More makes image better but generation is much slower
   var max_depth = 50; //recursion depth for ray bouncing, more means less black spots
-  var cam = new camera();
+  var cam = new camera(120.0, canvasWidth / canvasHeight);
 
   for (var j = canvasHeight - 1; j >= 0; --j) {
     for (var i = 0; i < canvasWidth; ++i) {

@@ -1,8 +1,10 @@
 class camera {
-  constructor() {
-    this.aspect_ratio = canvasWidth / canvasHeight;
+  constructor(vfov, aspect_ratio) {
+    this.aspect_ratio = aspect_ratio;
 
-    this.viewport_height = 2.0;
+    var theta = this.degrees_to_radians(vfov);
+    var h = Math.tan(theta / 2.0);
+    this.viewport_height = 2.0 * h;
     this.viewport_width = this.aspect_ratio * this.viewport_height;
     this.focal_length = 1.0;
 
@@ -41,5 +43,8 @@ class camera {
     direction = add(direction, multiplyConst(this.vertical, v));
     direction = subtract(direction, this.origin);
     return new ray(this.origin, direction);
+  }
+  degrees_to_radians(degrees) {
+    return (degrees * Math.PI) / 180.0;
   }
 }
