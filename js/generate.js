@@ -64,18 +64,33 @@ function generate() {
   //world(scene)
   var world = new hittable_list();
   var material_ground = new lambertian(new color(0.8, 0.8, 0.0));
-  var material_center = new lambertian(new color(0.7, 0.3, 0.3));
-  var material_left = new metal(new color(0.8, 0.8, 0.8), 0.3);
+  var material_center = new lambertian(new color(0.1, 0.2, 0.5));
+  var material_left = new dielectric(1.5);
   var material_right = new metal(new color(0.8, 0.6, 0.2), 0.1);
 
   world.add(new sphere(new point3(0.0, -100.5, -1.0), 100.0, material_ground));
   world.add(new sphere(new point3(0.0, 0.0, -1.0), 0.5, material_center));
   world.add(new sphere(new point3(-1.0, 0.0, -1.0), 0.5, material_left));
+  //world.add(new sphere(new point3(-1.0, 0.0, -1.0), -0.4, material_left));
   world.add(new sphere(new point3(1.0, 0.0, -1.0), 0.5, material_right));
   //camera settings
-  var samples_per_pixel = 10; //More makes image better but generation is much slower
+  var samples_per_pixel = 15; //More makes image better but generation is much slower
   var max_depth = 100; //recursion depth for ray bouncing, more means less black spots
-  var cam = new camera();
+  var lookfrom = new point3(-2, 2, 2);
+  var lookat = new point3(0, 0, -1);
+  var vup = new point3(0, 1, 0);
+  var dist_to_focus = subtract(lookfrom, lookat).length();
+  var aperture = 0.2;
+  var aspect_ratio = canvasWidth / canvasHeight;
+  var cam = new camera(
+    lookfrom,
+    lookat,
+    vup,
+    20,
+    aspect_ratio,
+    aperture,
+    dist_to_focus
+  );
 
   for (var j = canvasHeight - 1; j >= 0; --j) {
     for (var i = 0; i < canvasWidth; ++i) {
