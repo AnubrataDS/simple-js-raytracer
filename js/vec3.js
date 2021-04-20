@@ -124,6 +124,13 @@ function refract(uv, n, etai_over_etat) {
 function random_vector() {
   return new vec3(Math.random(), Math.random(), Math.random());
 }
+function random_in_unit_disk() {
+  while (true) {
+    var p = new vec3(random_ranged(-1, 1), random_ranged(-1, 1), 0);
+    if (p.length_squared() >= 1) continue;
+    return p;
+  }
+}
 
 function random_vector(min, max) {
   return new vec3(
