@@ -76,17 +76,17 @@ function generate() {
   world.add(new sphere(new point3(0.0, -1000, 0), 1000.0, material_ground));
 
   //small random spheres
-  for (var i = -2; i < 2; i++) {
+  for (var i = 0; i < 10; i++) {
     var choose_mat = Math.random();
     var radius = random_ranged(0.1, 0.5);
-    var center = new vec3(random_ranged(-4, 4), radius, random_ranged(0, 2));
+    var center = new vec3(random_ranged(-4, 4), radius, random_ranged(0, 3));
     if (subtract(center, new point3(4, 0.2, 0)).length() > 0.9) {
-      if (choose_mat < 0.8) {
+      if (choose_mat < 0.3) {
         // diffuse
         var albedo = new color(Math.random(), Math.random(), Math.random());
         var sphere_material = new lambertian(albedo);
         world.add(new sphere(center, radius, sphere_material));
-      } else if (choose_mat < 0.95) {
+      } else if (choose_mat < 0.8) {
         // metal
         var albedo = new color(
           random_ranged(0.5, 1),
@@ -103,23 +103,20 @@ function generate() {
       }
     }
   }
-  console.log("spheres done");
   //big spheres
-  var material_center = new lambertian(new color(0.1, 0.2, 0.5));
-  var material_left = new dielectric(1.5);
-  var material_right = new metal(new color(0.8, 0.6, 0.2), 0.1);
+  var material_lambert = new lambertian(new color(0.1, 0.2, 0.5));
+  var material_glass = new dielectric(1.5);
+  var material_metal = new metal(new color(0.8, 0.6, 0.2), 0.1);
 
-  world.add(new sphere(new point3(0, 1, 0), 1.0, material_center));
-  world.add(new sphere(new point3(-4, 1, 0), 1.0, material_left));
+  world.add(new sphere(new point3(0, 1, 0), 1.0, material_glass));
+  world.add(new sphere(new point3(-4, 1, 0), 1.0, material_lambert));
   //world.add(new sphere(new point3(-1.0, 0.0, -1.0), -0.4, material_left));
-  world.add(new sphere(new point3(4, 1, 0), 1.0, material_right));
+  world.add(new sphere(new point3(4, 1, 0), 1.0, material_metal));
   //camera settings
-  var samples_per_pixel = 10; //More makes image better but generation is much slower
-  var max_depth = 10; //recursion depth for ray bouncing, more means less black spots
-  var lookfrom = new point3(-13, 2 + random_ranged(0, 5), 3);
+  var lookfrom = new point3(-13, 6, 5);
   var lookat = new point3(0, 0, 0);
   var vup = new point3(0, 1, 0);
-  var dist_to_focus = 10.0;
+  var dist_to_focus = subtract(lookfrom, lookat).length();
   var aperture = 0.1;
   var aspect_ratio = canvasWidth / canvasHeight;
   var cam = new camera(
@@ -131,6 +128,10 @@ function generate() {
     aperture,
     dist_to_focus
   );
+
+  //quality settings
+  var samples_per_pixel = 10; //More makes image better but generation is much slower
+  var max_depth = 5; //recursion depth for ray bouncing, more means less black spots
 
   for (var j = canvasHeight - 1; j >= 0; --j) {
     for (var i = 0; i < canvasWidth; ++i) {
