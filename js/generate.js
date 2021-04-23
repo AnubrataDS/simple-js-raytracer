@@ -59,10 +59,7 @@ function write_color(col, samples_per_pixel) {
   return toneMap(newCol);
 }
 
-//Generate the image
-//generates a smooth gradient for now
-function generate() {
-  //world(scene)
+function generateWorld() {
   var world = new hittable_list();
 
   //ground
@@ -112,8 +109,12 @@ function generate() {
   world.add(new sphere(new point3(-4, 1, 0), 1.0, material_lambert));
   //world.add(new sphere(new point3(-1.0, 0.0, -1.0), -0.4, material_left));
   world.add(new sphere(new point3(4, 1, 0), 1.0, material_metal));
-  //camera settings
-  var lookfrom = new point3(-13, 6, 5);
+
+  return world;
+}
+
+function getCamera() {
+  var lookfrom = new point3(13 * Math.sign(random_ranged(-1, 1)), 3, 5);
   var lookat = new point3(0, 0, 0);
   var vup = new point3(0, 1, 0);
   var dist_to_focus = subtract(lookfrom, lookat).length();
@@ -128,22 +129,35 @@ function generate() {
     aperture,
     dist_to_focus
   );
-
-  //quality settings
-  var samples_per_pixel = 10; //More makes image better but generation is much slower
-  var max_depth = 5; //recursion depth for ray bouncing, more means less black spots
+  return cam;
+}
+//Generate the image
+//generates a smooth gradient for now
+function generate(world, cam, sampleCount) {
+  var max_depth = 15; //recursion depth for ray bouncing, more means less black spots
 
   for (var j = canvasHeight - 1; j >= 0; --j) {
     for (var i = 0; i < canvasWidth; ++i) {
-      var pixel_color = new color(0, 0, 0);
-      for (var s = 0; s < samples_per_pixel; ++s) {
-        var u = (i + Math.random()) / (canvasWidth - 1);
-        var v = (j + Math.random()) / (canvasHeight - 1);
-        var r = cam.getRay(u, v);
-        pixel_color.add(ray_color(r, world, max_depth));
-      }
-
-      pixel[i][j] = write_color(pixel_color, samples_per_pixel);
+      //var pixel_color = new color(0, 0, 0);
+      var u = (i + Math.random()) / (canvasWidth - 1);
+      var v = (j + Math.random()) / (canvasHeight - 1);
+      var r = cam.getRay(u, v);
+      var pixel_color = ray_color(r, world, max_depth);
+      var final = reverse_write_color(pixel[i][j], sampleCount - 1);
+      final = add(final, pixel_color);
+      final = write_color(final, sampleCount);
+      //cons;
+      pixel[i][j] = final;
     }
   }
+}
+
+function reverse_write_color(col, sampleCount) {
+  var res = multiplyConst(col, 1.0 / 256);
+  res = new color(
+    res.x() * res.x() * sampleCount,
+    res.y() * res.y() * sampleCount,
+    res.z() * res.z() * sampleCount
+  );
+  return res;
 }

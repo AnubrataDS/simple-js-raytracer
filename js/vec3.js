@@ -6,24 +6,7 @@ class vec3 {
     this.e[2] = e2;
   }
   //I can't believe I'm saying this but right now I wish JS had operator overloading
-  add(v) {
-    this.e[0] += v.e[0];
-    this.e[1] += v.e[1];
-    this.e[2] += v.e[2];
-    return this;
-  }
-  subtract(v) {
-    return this.add(v.negative());
-  }
-  multiply(t) {
-    this.e[0] *= t;
-    this.e[1] *= t;
-    this.e[2] *= t;
-    return this;
-  }
-  divide(t) {
-    return this.multiply(1.0 / t);
-  }
+
   negative() {
     return new vec3(-this.e[0], -this.e[1], -this.e[2]);
   }

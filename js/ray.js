@@ -13,4 +13,8 @@ class ray {
     this.origin = r.origin;
     this.direction = r.direction;
   }
+  set(origin, direction) {
+    this.origin = origin;
+    this.direction = direction;
+  }
 }

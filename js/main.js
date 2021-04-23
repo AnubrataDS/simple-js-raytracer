@@ -15,19 +15,25 @@ function render(pixel) {
       canvasData.data[index + 3] = 255;
     }
   }
-
   ctx.putImageData(canvasData, 0, 0);
 }
+var worker;
 function main() {
-  var worker = new Worker("js/worker.js");
+  worker = new Worker("js/worker.js");
   var canvas = document.getElementById("MainCanvas");
   worker.postMessage({ width: canvas.width, height: canvas.height });
   worker.onmessage = function (e) {
-    //console.log(e.data);
-    var t1 = performance.now();
-    render(e.data);
-    var t2 = performance.now();
-    console.log(`Rendered in ${t2 - t1} ms`);
+    render(e.data.pixel);
+    document.getElementById("status").innerHTML = `Pass ${e.data.pass} took ${
+      e.data.time
+    }ms , remaining : ${50 - e.data.pass} passes`;
   };
 }
-main();
+document.addEventListener("DOMContentLoaded", function () {
+  main();
+});
+
+function newImage() {
+  worker.terminate();
+  main();
+}
