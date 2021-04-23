@@ -13,7 +13,7 @@ class lambertian extends material {
   scatter(r_in, rec, attenuation, scattered) {
     var scatter_direction = add(rec.normal, random_unit_vec());
 
-    if (scatter_direction.near_zero()) scatter_direction = rec.normal;
+    if (near_zero(scatter_direction)) scatter_direction = rec.normal;
 
     scattered.set(rec.p, scatter_direction);
     attenuation.copy(this.albedo);

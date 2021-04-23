@@ -18,7 +18,7 @@ onmessage = function (e) {
     generate(world, camera, s);
     var t1 = performance.now();
     postMessage({
-      pixel: unwrapPixels,
+      pixel: pixel,
       pass: s,
       time: t1 - t0,
     });

@@ -57,9 +57,9 @@ class sphere extends hittable {
     //we return boolean based on whether ray hits, and modify rec with details if it hits
 
     var oc = subtract(r.origin, this.center);
-    var a = r.direction.length_squared();
+    var a = length_squared(r.direction);
     var half_b = dot(oc, r.direction);
-    var c = oc.length_squared() - this.radius * this.radius;
+    var c = length_squared(oc) - this.radius * this.radius;
     var discriminant = half_b * half_b - a * c;
     if (discriminant < 0) return false;
     var sqrtd = Math.sqrt(discriminant);
