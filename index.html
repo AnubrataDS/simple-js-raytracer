@@ -17,18 +17,14 @@
 
       <a href="https://github.com/AnubrataDS/simple-js-raytracer">the code</a>
     </div>
-    <div>Image may take 5+ seconds to generate</div>
-    <div>Parts of the scene are randomized everytime</div>
-    <div>Keep refreshing to see new images</div>
+    <div>Image starts noisy and progressively cleans up with each pass</div>
     <canvas id="MainCanvas" width="480" height="270"></canvas>
-    <script src="js/ray.js"></script>
-    <script src="js/material.js"></script>
-    <script src="js/camera.js"></script>
-    <script src="js/vec3.js"></script>
-    <script src="js/hittable.js"></script>
-    <script src="js/globals.js"></script>
-    <script src="js/generate.js"></script>
-    <script src="js/render.js"></script>
+
+    <div id="status"></div>
+
+    <div>
+      <button onclick="newImage()">New Image</button>
+    </div>
     <script src="js/main.js"></script>
   </body>
 </html>
