@@ -12,7 +12,7 @@ class lambertian extends material {
 
     if (scatter_direction.near_zero()) scatter_direction = rec.normal;
 
-    scattered.copy(new ray(rec.p, scatter_direction));
+    scattered.set(rec.p, scatter_direction);
     attenuation.copy(this.albedo);
     return true;
   }
@@ -27,7 +27,7 @@ class metal extends material {
   scatter(r_in, rec, attenuation, scattered) {
     var reflected = reflect(unit_vector(r_in.direction), rec.normal);
     reflected = add(reflected, multiplyConst(random_unit_vec(), this.fuzz));
-    scattered.copy(new ray(rec.p, reflected));
+    scattered.set(rec.p, reflected);
     attenuation.copy(this.albedo);
     return dot(scattered.direction, rec.normal) > 0;
   }
@@ -62,7 +62,7 @@ class dielectric extends material {
       direction = refract(unit_direction, rec.normal, refraction_ratio);
     }
 
-    scattered.copy(new ray(rec.p, direction));
+    scattered.set(rec.p, direction);
     return true;
   }
   reflectance(cosine, ref_idx) {
