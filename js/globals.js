@@ -8,12 +8,7 @@ function initialize(width, height) {
   pixel = [];
   canvasHeight = height;
   canvasWidth = width;
-  for (var x = 0; x < canvasWidth; x++) {
-    pixel[x] = [];
-  }
-  for (var x = 0; x < canvasWidth; x++) {
-    for (var y = 0; y < canvasHeight; y++) {
-      pixel[x][y] = new color(0.0, 0.0, 0.0);
-    }
+  for (var i = 0; i < height * width * 4; i++) {
+    pixel.push(0);
   }
 }

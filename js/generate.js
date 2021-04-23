@@ -1,9 +1,9 @@
 //utility to map values from range 0-1 to range 0-255
 function toneMap(col) {
   return new color(
-    Math.floor(256 * clamp(col.x(), 0, 0.999)),
-    Math.floor(256 * clamp(col.y(), 0, 0.999)),
-    Math.floor(256 * clamp(col.z(), 0, 0.999))
+    Math.floor(256 * clamp(col.e[0], 0, 0.999)),
+    Math.floor(256 * clamp(col.e[1], 0, 0.999)),
+    Math.floor(256 * clamp(col.e[2], 0, 0.999))
   );
 }
 
@@ -27,7 +27,7 @@ function sky_gradient(r) {
 function random_unit_vec() {
   while (true) {
     var p = random_vector(-1, 1);
-    if (p.length_squared() >= 1) continue;
+    if (length_squared(p) >= 1) continue;
     return p;
   }
 }
@@ -56,9 +56,9 @@ function write_color(col, samples_per_pixel) {
   var scale = 1.0 / samples_per_pixel;
   //gamma correction
   var newCol = new color(
-    Math.sqrt(col.x() * scale),
-    Math.sqrt(col.y() * scale),
-    Math.sqrt(col.z() * scale)
+    Math.sqrt(col.e[0] * scale),
+    Math.sqrt(col.e[1] * scale),
+    Math.sqrt(col.e[2] * scale)
   );
   return toneMap(newCol);
 }
@@ -81,7 +81,7 @@ function generateWorld() {
     var choose_mat = Math.random();
     var radius = random_ranged(0.1, 0.5);
     var center = new vec3(random_ranged(-5, 5), radius, random_ranged(0, 4));
-    if (subtract(center, new point3(4, 0.2, 0)).length() > 0.9) {
+    if (length(subtract(center, new point3(4, 0.2, 0))) > 0.9) {
       if (choose_mat < 0.4) {
         //light
         var col = new color(
@@ -130,7 +130,7 @@ function getCamera() {
   var lookfrom = new point3(13 * Math.sign(random_ranged(-1, 1)), 4, 5);
   var lookat = new point3(0, 0, 0);
   var vup = new point3(0, 1, 0);
-  var dist_to_focus = subtract(lookfrom, lookat).length();
+  var dist_to_focus = length(subtract(lookfrom, lookat));
   var aperture = 0.1;
   var aspect_ratio = canvasWidth / canvasHeight;
   var cam = new camera(
@@ -148,7 +148,6 @@ function getCamera() {
 //generates a smooth gradient for now
 function generate(world, cam, sampleCount) {
   var max_depth = 15; //recursion depth for ray bouncing, more means less black spots
-
   for (var j = canvasHeight - 1; j >= 0; --j) {
     for (var i = 0; i < canvasWidth; ++i) {
       //var pixel_color = new color(0, 0, 0);
@@ -156,11 +155,17 @@ function generate(world, cam, sampleCount) {
       var v = (j + Math.random()) / (canvasHeight - 1);
       var r = cam.getRay(u, v);
       var pixel_color = ray_color(r, world, max_depth);
-      var final = reverse_write_color(pixel[i][j], sampleCount - 1);
+      var index = (i + (canvasHeight - j) * canvasWidth) * 4;
+      var final = new color(pixel[index], pixel[index + 1], pixel[index + 2]);
+      final = reverse_write_color(final, sampleCount - 1);
       final = add(final, pixel_color);
       final = write_color(final, sampleCount);
       //cons;
-      pixel[i][j] = final;
+      //pixel[i][j] = final;
+      pixel[index] = final.e[0];
+      pixel[index + 1] = final.e[1];
+      pixel[index + 2] = final.e[2];
+      pixel[index + 3] = 255;
     }
   }
 }
@@ -168,9 +173,9 @@ function generate(world, cam, sampleCount) {
 function reverse_write_color(col, sampleCount) {
   var res = multiplyConst(col, 1.0 / 256);
   res = new color(
-    res.x() * res.x() * sampleCount,
-    res.y() * res.y() * sampleCount,
-    res.z() * res.z() * sampleCount
+    res.e[0] * res.e[0] * sampleCount,
+    res.e[1] * res.e[1] * sampleCount,
+    res.e[2] * res.e[2] * sampleCount
   );
   return res;
 }
