@@ -1,4 +1,7 @@
 class material {
+  emitted(u, v, p) {
+    return new color(0, 0, 0);
+  }
   scatter(r_in, rec, attenuation, scattered) {}
 }
 
@@ -70,5 +73,18 @@ class dielectric extends material {
     var r0 = (1 - ref_idx) / (1 + ref_idx);
     r0 = r0 * r0;
     return r0 + (1 - r0) * Math.pow(1 - cosine, 5);
+  }
+}
+
+class diffuse_light extends material {
+  constructor(c) {
+    super();
+    this.emit = new solid_color(c);
+  }
+  scatter(r_in, rec, attenuation, scattered) {
+    return false;
+  }
+  emitted(u, v, p) {
+    return this.emit.value(u, v, p);
   }
 }
