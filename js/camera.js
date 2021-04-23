@@ -40,8 +40,8 @@ class camera {
     //the offset part is to move things a little bit for forced DOF/ defocus blur effect
     var rd = multiplyConst(random_in_unit_disk(), this.lens_radius);
     var offset = add(
-      multiplyConst(this.u, rd.x()),
-      multiplyConst(this.v, rd.y())
+      multiplyConst(this.u, rd.e[0]),
+      multiplyConst(this.v, rd.e[1])
     );
 
     //direction = lower_left_corner + u*horizontal + v*vertical - origin
